@@ -17,7 +17,7 @@ class ProductDataset(Dataset):
         self.img_path_list = img_path_list
         self.label_list = label_list
         self.args = args
-        self.transforms = globals()[transforms]
+        self.transforms = transforms
         self.train_mode = train_mode
                                                                                                     
     def __getitem__(self, index):
@@ -25,7 +25,7 @@ class ProductDataset(Dataset):
         img = cv2.imread(img_path)
         
         # transforms
-        img = transforms(img=img, args=self.args)
+        img = globals()[self.transforms](img=img, args=self.args)
         
         # set train or valid mode
         if self.train_mode:
@@ -36,8 +36,6 @@ class ProductDataset(Dataset):
 
     def __len__(self):
         return len(self.img_path_list)
-
-# w ,h =  CFG["weight"], CFG["height"]
 
 def basic(img, args):
 

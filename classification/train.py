@@ -32,7 +32,7 @@ torch.backends.cudnn.enabled = False
 parser = argparse.ArgumentParser()
 
 """
-python train.py --name resnet18_128_basic --batch_size 32 --model resnet18 --CoarseDropout_num 1 ; python train.py --name resnet18_128_CD20 --batch_size 64 --model resnet18 --CoarseDropout_num 20 ;  python train.py --name resnet18_128_CD40 --batch_size 512 --model resnet18 --CoarseDropout_num 40 ;  python train.py --name resnet18_128_RB025 --batch_size 512 --model resnet18 --RandomBrightness 0.25 ;  python train.py --name resnet18_128_RB05 --batch_size 512 --model resnet18 --RandomBrightness 0.5 ;  
+python train.py --name test --batch_size 16 --model resnet18 --aug basic 
 """
 parser.add_argument("--weight", default=820, type=int)
 parser.add_argument("--height", default=685, type=int)
@@ -86,44 +86,7 @@ valid = valid[valid["label"] != -1]
 train["image_path"] = image_folder + train["image_path"]
 valid["image_path"] = image_folder + valid["image_path"]
 
-
-# # Dataset & Data Loader
-# class ItemDataset(Dataset):
-#     def __init__(self, img_path_list, label_list, train_mode=True, transforms=None):
-#         self.transforms = transforms
-#         self.train_mode = train_mode
-#         self.img_path_list = img_path_list
-#         self.label_list = label_list
-                                                                                                    
-#     def __getitem__(self, index):
-#         img_path = self.img_path_list[index]
-#         img = cv2.imread(img_path)
-        
-#         if self.transforms is not None:
-#             img = self.transforms(image=img)["image"]
-            
-#         if self.train_mode:
-#             label = self.label_list[index]
-#             return img, label
-#         else:
-#             return img
-
-#     def __len__(self):
-#         return len(self.img_path_list)
-
-# w ,h =  CFG["weight"], CFG["height"]
-
-# train_transform = A.Compose([
-#                         A.Resize(always_apply=False, p=1.0, height=h, width=w, interpolation=0),
-#                         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-#                         ToTensorV2()
-#                             ])
-
-# test_transform = A.Compose([
-#                         A.Resize(always_apply=False, p=1.0, height=h, width=w, interpolation=0),
-#                         A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-#                         ToTensorV2()
-#                             ])
+# dataset & dataloader
 dataset_module = getattr(import_module("dataset"), "ProductDataset")
 train_dataset = dataset_module(train["image_path"].tolist(), train["label"].tolist(), args, args.aug, True)
 valid_dataset = dataset_module(valid["image_path"].tolist(), valid["label"].tolist(), args, "basic", True)

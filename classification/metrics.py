@@ -19,11 +19,3 @@ def classification_metrics(true_list, pred_list, label_to_class):
     wandb.log(result)
 
     return result
-
-    
-
-
-
-# wandb.log(result)
-
-# valid_loss

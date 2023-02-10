@@ -144,7 +144,6 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
             
     model.to(device)
     best_acc = 0
-    # metrics = {"Accuracy":[],"Precision":[],"Recall":[],"F1-Score":[]}
 
     # train
     for epoch in range(1,CFG["epochs"]+1):
@@ -161,8 +160,6 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
-        
-        # print('[%d] Train loss: %.10f' %(epoch, running_loss / len(train_loader)))
         
         if scheduler is not None:
             scheduler.step()
@@ -189,34 +186,6 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
 
         
         result = metrics.classification_metrics(test_list, pred_list, label_to_class)
-        # for i in range(len(label_to_class)):
-        #     result[label_to_class[i]+"_Precision"] = report[str(i)]["precision"]
-        #     result[label_to_class[i]+"_F1"] = report[str(i)]["f1-score"]
-        #     result[label_to_class[i]+"_Recall"] = report[str(i)]["recall"]
-        # result["good_precision"] = report["0"]["precision"]
-        # result["good_F1-score"] = report["0"]["f1-score"]
-        # result["good_recall"] = report["0"]["recall"]
-
-        # result["crack_precision"] = report["1"]["precision"]
-        # result["crack_F1-score"] = report["1"]["f1-score"]
-        # result["crack_recall"] = report["1"]["recall"]
-
-        # result["pull_precision"] = report["2"]["precision"]
-        # result["pull_F1-score"] = report["2"]["f1-score"]
-        # result["pull_recall"] = report["2"]["recall"]
-
-        # result["double_precision"] = report["3"]["precision"]
-        # result["double_F1-score"] = report["3"]["f1-score"]
-        # result["double_recall"] = report["3"]["recall"]
-
-        # result["ACC"] = report["accuracy"]
-        # result["Precision"] = report["macro avg"]["precision"]
-        # result["Recall"] = report["macro avg"]["recall"]
-        # result["F1-Score"] = report["macro avg"]["f1-score"]
-
-        # wandb.log(result)
-
-        # valid_loss
         
         print(f"===================== EPOCH_{epoch} =====================")
         print("ACC : ", result["ACC"])

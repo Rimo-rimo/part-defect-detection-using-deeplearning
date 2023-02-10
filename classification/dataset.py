@@ -45,13 +45,3 @@ def basic(img, args):
                           ])
 
     return transform(image=img)["image"]
-
-# def heavy_aug(img, args):
-
-#     transform = A.Compose([
-#                     A.Resize(always_apply=False, p=1.0, height=args.height, width=args.weight, interpolation=0),
-#                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-#                     ToTensorV2()
-#                           ])
-
-#     return transform(image=img)["image"]

@@ -25,8 +25,6 @@ from albumentations.pytorch import ToTensorV2
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score, classification_report
-
-torch.backends.cudnn.enabled = False
 # import wandb
 
 parser = argparse.ArgumentParser()
@@ -68,6 +66,29 @@ CFG = {
     "num_classes":args.num_classes,
     }
 
+# Setting
+device = CFG["device"]
+
+if torch.cuda.is_available():    
+    #device = torch.device("cuda:0")
+    print('Device:', device)
+    print('There are %d GPU(s) available.' % torch.cuda.device_count())
+    print('We will use the GPU:', torch.cuda.get_device_name(0))
+else:
+    device = torch.device("cpu")
+    print('No GPU available, using the CPU instead.')
+    
+def seed_everything(seed):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = True
+
+seed_everything(42)
+
 # loging
 # wandb.init()
 # wandb.run.name = CFG["name"]
@@ -94,38 +115,9 @@ valid_dataset = dataset_module(valid["image_path"].tolist(), valid["label"].toli
 train_loader = DataLoader(train_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)
 valid_loader = DataLoader(valid_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)
 
-# Modeling
-device = CFG["device"]
-
-if torch.cuda.is_available():    
-    #device = torch.device("cuda:0")
-    print('Device:', device)
-    print('There are %d GPU(s) available.' % torch.cuda.device_count())
-    print('We will use the GPU:', torch.cuda.get_device_name(0))
-else:
-    device = torch.device("cpu")
-    print('No GPU available, using the CPU instead.')
-    
-def seed_everything(seed):
-    random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = True
-
-seed_everything(42)
-
+# modeling
 model_module = getattr(import_module("model"), CFG["model"])
 model = model_module(num_classes=CFG["num_classes"]).to(device)
-
-# if CFG["model"] == "resnet18":
-#     model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
-#     model.fc = nn.Linear(in_features = 512, out_features=4, bias=True)
-# elif CFG["model"] == "resnet50":
-#     model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=True)
-#     model.fc = nn.Linear(in_features = 2048, out_features=4, bias=True)
 
 if CFG["criterion"] == "CrossEntropyLoss":
     criterion = torch.nn.CrossEntropyLoss()

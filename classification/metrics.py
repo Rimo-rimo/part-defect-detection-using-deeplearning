@@ -1,4 +1,5 @@
 from sklearn.metrics import classification_report
+import wandb
 
 
 
@@ -15,6 +16,7 @@ def classification_metrics(true_list, pred_list, label_to_class):
     result["Precision"] = report["macro avg"]["precision"]
     result["Recall"] = report["macro avg"]["recall"]
     result["F1-Score"] = report["macro avg"]["f1-score"]
+    wandb.log(result)
 
     return result
 

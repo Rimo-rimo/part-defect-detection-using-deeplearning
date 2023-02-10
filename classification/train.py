@@ -25,7 +25,7 @@ from albumentations.pytorch import ToTensorV2
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-# import wandb
+import wandb
 import pdb
 import metrics
 
@@ -92,9 +92,9 @@ def seed_everything(seed):
 seed_everything(42)
 
 # loging
-# wandb.init()
-# wandb.run.name = CFG["name"]
-# wandb.config.update(CFG)
+wandb.init()
+wandb.run.name = CFG["name"]
+wandb.config.update(CFG)
 
 # Get Data
 data_folder = "/home/chicken/project/ABL/data/"

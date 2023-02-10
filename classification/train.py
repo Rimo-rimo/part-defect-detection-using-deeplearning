@@ -26,6 +26,7 @@ from albumentations.pytorch import ToTensorV2
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score, classification_report
 # import wandb
+import pdb
 
 parser = argparse.ArgumentParser()
 
@@ -110,7 +111,7 @@ valid["image_path"] = image_folder + valid["image_path"]
 # dataset & dataloader
 dataset_module = getattr(import_module("dataset"), "ProductDataset")
 train_dataset = dataset_module(train["image_path"].tolist(), train["label"].tolist(), args, args.aug, True)
-valid_dataset = dataset_module(valid["image_path"].tolist(), valid["label"].tolist(), args, "basic", True)
+valid_dataset = dataset_module(valid["image_path"].tolist(), valid["label"].tolist(), args, "basic", True) # metric을 얻기위해 train_mode = True
 
 train_loader = DataLoader(train_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)
 valid_loader = DataLoader(valid_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)
@@ -142,7 +143,8 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
             
     model.to(device)
     best_acc = 0
-    metrics = {"Accuracy":[],"Precision":[],"Recall":[],"F1-Score":[]}
+    # metrics = {"Accuracy":[],"Precision":[],"Recall":[],"F1-Score":[]}
+
     # train
     for epoch in range(1,CFG["epochs"]+1):
         model.train()
@@ -150,8 +152,8 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
         
         for img, label in tqdm(iter(train_loader)):
             img, label = img.to(device), label.to(device)
+
             optimizer.zero_grad()
-            
             pred = model(img)
             loss = criterion(pred, label)
             
@@ -180,7 +182,8 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
                 pred = pred.argmax(dim=1, keepdim=True)
                 pred_list.extend(pred.cpu().numpy())
                 test_list.extend(label.cpu().numpy())
-
+                
+        pdb.set_trace()
         report = classification_report(test_list, pred_list, output_dict = True)
         result = dict()
 

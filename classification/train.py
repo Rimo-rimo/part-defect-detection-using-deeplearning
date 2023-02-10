@@ -24,9 +24,10 @@ from albumentations import *
 from albumentations.pytorch import ToTensorV2
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score, classification_report
+from sklearn.metrics import classification_report
 # import wandb
 import pdb
+import metrics
 
 parser = argparse.ArgumentParser()
 
@@ -185,11 +186,13 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
                 
         report = classification_report(test_list, pred_list, output_dict = True)
         label_to_class = ["정상", "이중선", "밀림", "찍힘"]
-        result = dict()
-        for i in range(len(label_to_class)):
-            result[label_to_class[i]+"_Precision"] = report[str(i)]["precision"]
-            result[label_to_class[i]+"_F1"] = report[str(i)]["f1-score"]
-            result[label_to_class[i]+"_Recall"] = report[str(i)]["recall"]
+
+        
+        result = metrics.classification_metrics(test_list, pred_list, label_to_class)
+        # for i in range(len(label_to_class)):
+        #     result[label_to_class[i]+"_Precision"] = report[str(i)]["precision"]
+        #     result[label_to_class[i]+"_F1"] = report[str(i)]["f1-score"]
+        #     result[label_to_class[i]+"_Recall"] = report[str(i)]["recall"]
         # result["good_precision"] = report["0"]["precision"]
         # result["good_F1-score"] = report["0"]["f1-score"]
         # result["good_recall"] = report["0"]["recall"]
@@ -206,14 +209,14 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
         # result["double_F1-score"] = report["3"]["f1-score"]
         # result["double_recall"] = report["3"]["recall"]
 
-        result["ACC"] = report["accuracy"]
-        result["Precision"] = report["macro avg"]["precision"]
-        result["Recall"] = report["macro avg"]["recall"]
-        result["F1-Score"] = report["macro avg"]["f1-score"]
+        # result["ACC"] = report["accuracy"]
+        # result["Precision"] = report["macro avg"]["precision"]
+        # result["Recall"] = report["macro avg"]["recall"]
+        # result["F1-Score"] = report["macro avg"]["f1-score"]
 
         # wandb.log(result)
 
-        valid_loss
+        # valid_loss
         
         print(f"===================== EPOCH_{epoch} =====================")
         print("ACC : ", result["ACC"])

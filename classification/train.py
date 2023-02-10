@@ -183,25 +183,28 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
                 pred_list.extend(pred.cpu().numpy())
                 test_list.extend(label.cpu().numpy())
                 
-        pdb.set_trace()
         report = classification_report(test_list, pred_list, output_dict = True)
+        label_to_class = ["정상", "이중선", "밀림", "찍힘"]
         result = dict()
+        for i in range(len(label_to_class)):
+            result[label_to_class[i]+"_Precision"] = report[str(i)]["precision"]
+            result[label_to_class[i]+"_F1"] = report[str(i)]["f1-score"]
+            result[label_to_class[i]+"_Recall"] = report[str(i)]["recall"]
+        # result["good_precision"] = report["0"]["precision"]
+        # result["good_F1-score"] = report["0"]["f1-score"]
+        # result["good_recall"] = report["0"]["recall"]
 
-        result["good_precision"] = report["0"]["precision"]
-        result["good_F1-score"] = report["0"]["f1-score"]
-        result["good_recall"] = report["0"]["recall"]
+        # result["crack_precision"] = report["1"]["precision"]
+        # result["crack_F1-score"] = report["1"]["f1-score"]
+        # result["crack_recall"] = report["1"]["recall"]
 
-        result["crack_precision"] = report["1"]["precision"]
-        result["crack_F1-score"] = report["1"]["f1-score"]
-        result["crack_recall"] = report["1"]["recall"]
+        # result["pull_precision"] = report["2"]["precision"]
+        # result["pull_F1-score"] = report["2"]["f1-score"]
+        # result["pull_recall"] = report["2"]["recall"]
 
-        result["pull_precision"] = report["2"]["precision"]
-        result["pull_F1-score"] = report["2"]["f1-score"]
-        result["pull_recall"] = report["2"]["recall"]
-
-        result["double_precision"] = report["3"]["precision"]
-        result["double_F1-score"] = report["3"]["f1-score"]
-        result["double_recall"] = report["3"]["recall"]
+        # result["double_precision"] = report["3"]["precision"]
+        # result["double_F1-score"] = report["3"]["f1-score"]
+        # result["double_recall"] = report["3"]["recall"]
 
         result["ACC"] = report["accuracy"]
         result["Precision"] = report["macro avg"]["precision"]

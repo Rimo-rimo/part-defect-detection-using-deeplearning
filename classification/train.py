@@ -45,6 +45,7 @@ parser.add_argument("--aug", default="basic")
 parser.add_argument("--num_classes", default=4, type=int)
 parser.add_argument("--device", default="cuda")
 parser.add_argument("--name", default="test")
+parser.add_argument("--wandb", default=False, type=bool)
 args = parser.parse_args()
 
 print("====="*5)
@@ -66,6 +67,7 @@ CFG = {
     "model":args.model,
     "aug":args.aug,
     "num_classes":args.num_classes,
+    "wandb":args.wandb
     }
 
 # Setting
@@ -111,9 +113,10 @@ def seed_everything(seed):
 seed_everything(42)
 
 # loging
-wandb.init()
-wandb.run.name = CFG["name"]
-wandb.config.update(CFG)
+if args.wandb:
+    wandb.init()
+    wandb.run.name = CFG["name"]
+    wandb.config.update(CFG)
 
 # Get Data
 data_folder = "/home/chicken/project/ABL/data/"
@@ -204,7 +207,7 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
         label_to_class = ["정상", "이중선", "밀림", "찍힘"]
 
         
-        result = metrics.classification_metrics(test_list, pred_list, label_to_class)
+        result = metrics.classification_metrics(test_list, pred_list, label_to_class, args.wandb)
         
         print(f"===================== EPOCH_{epoch} =====================")
         print("ACC : ", result["ACC"])

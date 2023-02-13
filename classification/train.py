@@ -79,7 +79,26 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
     print('No GPU available, using the CPU instead.')
+
+def set_model_folder(args):
+    # models 폴더 유무 확인
+    if os.path.isdir("./models"):
+        pass
+    else:
+        os.mkdir("./models")
     
+    # 모델 저장할 폴더 생성
+    cnt = 0
+    while True:
+        if cnt != 0:
+            args.name = args.name + str(cnt)
+        
+        if os.path.isdir(f"./models/{args.name}"):
+            cnt += 1
+        else:
+            os.mkdir(f"./models/{args.name}")
+            break
+
 def seed_everything(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -130,17 +149,17 @@ if CFG["scheduler"] == None:
     scheduler = None
 
 def train(model, optimizer, train_loader, valid_loader, scheduler, device, model_name):
-    cnt = 0
-    while True:
-        try:
-            if cnt ==0:
-                os.mkdir(f"./models/{model_name}")
-            else:
-                os.mkdir(f"./models/{model_name}_{cnt}")
-            break
-        except:
-            pass
-        cnt += 1
+    # cnt = 0
+    # while True:
+    #     try:
+    #         if cnt ==0:
+    #             os.mkdir(f"./models/{model_name}")
+    #         else:
+    #             os.mkdir(f"./models/{model_name}_{cnt}")
+    #         break
+    #     except:
+    #         pass
+    #     cnt += 1
             
     model.to(device)
     best_acc = 0
@@ -201,8 +220,8 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
 
 
 if __name__ == "__main__":
-
-    metrics = train(model, optimizer, train_loader,valid_loader, scheduler, device, CFG["name"])
+    set_model_folder(CFG)
+    metrics = train(model, optimizer, train_loader,valid_loader, scheduler, device, args.name)
 
     df = pd.DataFrame(metrics)
     name = CFG["name"]

@@ -76,8 +76,8 @@ def clahe_aug(img, args):
 
     transform = A.Compose([
                     A.Resize(always_apply=False, p=1.0, height=args.height, width=args.weight, interpolation=0),
-                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     A.CLAHE(always_apply=False, p=0.3, clip_limit=(1, 4), tile_grid_size=(8, 8)),
+                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     ToTensorV2()
                           ])
     return transform(image=img)["image"]
@@ -86,7 +86,6 @@ def heavy_aug(img, args):
 
     transform = A.Compose([
                     A.Resize(always_apply=False, p=1.0, height=args.height, width=args.weight, interpolation=0),
-                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     A.OneOf([
                         A.Blur(always_apply=False, p=1.0, blur_limit=(1, 13)),
                         A.AdvancedBlur(always_apply=False, p=1.0, blur_limit=(3, 7), sigmaX_limit=(0.2, 1.0), sigmaY_limit=(0.2, 1.0), rotate_limit=(-90, 90), beta_limit=(0.5, 8.0), noise_limit=(0.9, 1.1)),
@@ -96,6 +95,7 @@ def heavy_aug(img, args):
                         A.HorizontalFlip(always_apply=False, p=1.0),
                         A.VerticalFlip(always_apply=False, p=1.0),
                     ], p=0.5),
+                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     ToTensorV2()
                           ])
 

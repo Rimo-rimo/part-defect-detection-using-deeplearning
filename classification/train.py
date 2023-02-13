@@ -119,7 +119,7 @@ def set_model_folder(args):
 
 # Get Data
 data_folder = "/home/chicken/project/ABL/data/"
-image_folder = "/home/chicken/project/ABL/data/images/"
+image_folder = "/home/chicken/project/ABL/data/crop_images/"
 
 train = pd.read_csv(os.path.join(data_folder, "train_csv_.csv"))
 valid = pd.read_csv(os.path.join(data_folder, "test_csv_.csv"))

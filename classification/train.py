@@ -220,7 +220,7 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
 
 
 if __name__ == "__main__":
-    set_model_folder(CFG)
+    set_model_folder(args)
     metrics = train(model, optimizer, train_loader,valid_loader, scheduler, device, args.name)
 
     df = pd.DataFrame(metrics)

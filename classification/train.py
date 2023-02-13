@@ -32,12 +32,23 @@ import metrics
 parser = argparse.ArgumentParser()
 
 """
-python train.py --name test --batch_size 16 --model resnet18 --aug basic 
+python train.py --model resnet50 --wandb True --name basic --aug basic ; 
+python train.py --model resnet50 --wandb True --name flip_aug --aug flip_aug ; 
+python train.py --model resnet50 --wandb True --name noise_aug --aug noise_aug ; 
+python train.py --model resnet50 --wandb True --name clahe_aug --aug clahe_aug ; 
+python train.py --model resnet50 --wandb True --name heavy_aug --aug heavy_aug ; 
+
+aug
+    basic
+    flip_aug
+    noise_aug
+    clahe_aug
+    heavy_aug
 """
-parser.add_argument("--weight", default=820, type=int)
-parser.add_argument("--height", default=685, type=int)
+parser.add_argument("--weight", default=600, type=int)
+parser.add_argument("--height", default=250, type=int)
 parser.add_argument("--epochs", default=20,type=int)
-parser.add_argument("--batch_size", default=8,type=int)
+parser.add_argument("--batch_size", default=16,type=int)
 parser.add_argument("--lr", default=0.0001,type=float)
 parser.add_argument("--criterion", default="CrossEntropyLoss")
 parser.add_argument("--model", default="resnet50")
@@ -203,8 +214,9 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
         print("Recall : ", result["Recall"])
         print("F1-Score : ", result["F1-Score"])
 
-        if best_acc < result["ACC"]:
-            best_acc = result["ACC"]
+        # if best_acc < result["ACC"]:
+        #     best_acc = result["ACC"]
+        if epoch % 5 == 0:
             torch.save(model.state_dict(), f'./models/{model_name}/{epoch}.pth') #이 디렉토리에 best_model.pth을 저장
             print('Model Saved.')
     return metrics

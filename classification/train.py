@@ -46,6 +46,7 @@ parser.add_argument("--num_classes", default=4, type=int)
 parser.add_argument("--device", default="cuda")
 parser.add_argument("--name", default="test")
 parser.add_argument("--wandb", default=False, type=bool)
+parser.add_argument("--seed", default=42, type=int)
 args = parser.parse_args()
 
 print("====="*5)
@@ -67,29 +68,19 @@ CFG = {
     "model":args.model,
     "aug":args.aug,
     "num_classes":args.num_classes,
-    "wandb":args.wandb
+    "wandb":args.wandb,
+    "seed":args.seed
     }
 
-# Setting
-device = CFG["device"]
-
-if torch.cuda.is_available():    
-    #device = torch.device("cuda:0")
-    print('Device:', device)
-    print('There are %d GPU(s) available.' % torch.cuda.device_count())
-    print('We will use the GPU:', torch.cuda.get_device_name(0))
-else:
-    device = torch.device("cpu")
-    print('No GPU available, using the CPU instead.')
 
 def set_model_folder(args):
-    # models 폴더 유무 확인
+    # Check models folder
     if os.path.isdir("./models"):
         pass
     else:
         os.mkdir("./models")
     
-    # 모델 저장할 폴더 생성
+    # Set trained model folder
     cnt = 0
     while True:
         if cnt != 0:
@@ -101,22 +92,30 @@ def set_model_folder(args):
             os.mkdir(f"./models/{args.name}")
             break
 
-def seed_everything(seed):
-    random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
+    # Set GPU
+    device = CFG["device"]
+    if torch.cuda.is_available():    
+        print('Device:', device)
+        print('There are %d GPU(s) available.' % torch.cuda.device_count())
+        print('We will use the GPU:', torch.cuda.get_device_name(0))
+    else:
+        device = torch.device("cpu")
+        print('No GPU available, using the CPU instead.')
+
+    # Set seed
+    random.seed(args.seed)
+    os.environ['PYTHONHASHSEED'] = str(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
 
-seed_everything(42)
-
-# loging
-if args.wandb:
-    wandb.init()
-    wandb.run.name = CFG["name"]
-    wandb.config.update(CFG)
+    # Set Wandb loging
+    if args.wandb:
+        wandb.init()
+        wandb.run.name = args.name
+        wandb.config.update(args)
 
 # Get Data
 data_folder = "/home/chicken/project/ABL/data/"
@@ -141,7 +140,7 @@ valid_loader = DataLoader(valid_dataset, batch_size = CFG["batch_size"], shuffle
 
 # modeling
 model_module = getattr(import_module("model"), CFG["model"])
-model = model_module(num_classes=CFG["num_classes"]).to(device)
+model = model_module(num_classes=CFG["num_classes"]).to(args.device)
 
 if CFG["criterion"] == "CrossEntropyLoss":
     criterion = torch.nn.CrossEntropyLoss()
@@ -152,17 +151,6 @@ if CFG["scheduler"] == None:
     scheduler = None
 
 def train(model, optimizer, train_loader, valid_loader, scheduler, device, model_name):
-    # cnt = 0
-    # while True:
-    #     try:
-    #         if cnt ==0:
-    #             os.mkdir(f"./models/{model_name}")
-    #         else:
-    #             os.mkdir(f"./models/{model_name}_{cnt}")
-    #         break
-    #     except:
-    #         pass
-    #     cnt += 1
             
     model.to(device)
     best_acc = 0
@@ -224,7 +212,7 @@ def train(model, optimizer, train_loader, valid_loader, scheduler, device, model
 
 if __name__ == "__main__":
     set_model_folder(args)
-    metrics = train(model, optimizer, train_loader,valid_loader, scheduler, device, args.name)
+    metrics = train(model, optimizer, train_loader,valid_loader, scheduler, args.device, args.name)
 
     df = pd.DataFrame(metrics)
     name = CFG["name"]

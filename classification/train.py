@@ -45,7 +45,7 @@ parser.add_argument("--aug", default="basic")
 parser.add_argument("--num_classes", default=4, type=int)
 parser.add_argument("--device", default="cuda")
 parser.add_argument("--name", default="test")
-parser.add_argument("--wandb", default=False, type=bool)
+parser.add_argument("--wandb", default="False")
 parser.add_argument("--seed", default=42, type=int)
 args = parser.parse_args()
 
@@ -112,7 +112,7 @@ def set_model_folder(args):
     torch.backends.cudnn.benchmark = True
 
     # Set Wandb loging
-    if args.wandb:
+    if args.wandb == "True":
         wandb.init()
         wandb.run.name = args.name
         wandb.config.update(args)

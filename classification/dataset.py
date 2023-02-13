@@ -96,7 +96,6 @@ def heavy_aug(img, args):
                         A.HorizontalFlip(always_apply=False, p=1.0),
                         A.VerticalFlip(always_apply=False, p=1.0),
                     ], p=0.5),
-                    A.CLAHE(always_apply=False, p=0.3, clip_limit=(1, 4), tile_grid_size=(8, 8)),
                     ToTensorV2()
                           ])
 

@@ -93,14 +93,16 @@ def set_model_folder(args):
     
     # Set trained model folder
     cnt = 0
+    name_ = args.name
     while True:
         if cnt != 0:
-            args.name = args.name + str(cnt)
+            name_ = args.name + "_" + str(cnt)
         
-        if os.path.isdir(f"./models/{args.name}"):
+        if os.path.isdir(f"./models/{name_}"):
             cnt += 1
         else:
-            os.mkdir(f"./models/{args.name}")
+            os.mkdir(f"./models/{name_}")
+            args.name = name_
             break
 
     # Set GPU

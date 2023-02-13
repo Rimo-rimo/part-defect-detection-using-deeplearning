@@ -16,7 +16,7 @@ def classification_metrics(true_list, pred_list, label_to_class, log_wandb):
     result["Precision"] = report["macro avg"]["precision"]
     result["Recall"] = report["macro avg"]["recall"]
     result["F1-Score"] = report["macro avg"]["f1-score"]
-    if log_wandb:
+    if log_wandb == "True":
         wandb.log(result)
 
     return result

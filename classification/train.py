@@ -32,7 +32,8 @@ import metrics
 parser = argparse.ArgumentParser()
 
 """
-python train.py --model swinB --wandb True --name SwinB_basic --aug basic ; 
+python train.py --model resnet50 --wandb True --name resnet50_crop_basic --aug basic_crop --epochs 20 --batch_size 16 --device cuda:1 --valid_aug basic_crop; 
+python train.py --model resnet50 --wandb True --name resnet50_crop_noise --aug noise_crop --epochs 20 --batch_size 16 --device cuda:1 --valid_aug basic_crop; 
 python train.py --model swinB --wandb True --name SwinB_noise --aug noise_aug ; 
 python train.py --model swinS --wandb True --name SwinS_basic --aug basic ; 
 python train.py --model swinS --wandb True --name SwinS_noise --aug noise_aug ; 
@@ -49,11 +50,12 @@ aug
 parser.add_argument("--weight", default=600, type=int)
 parser.add_argument("--height", default=250, type=int)
 parser.add_argument("--epochs", default=30,type=int)
-parser.add_argument("--batch_size", default=16,type=int)
+parser.add_argument("--batch_size", default=8,type=int)
 parser.add_argument("--lr", default=0.0001,type=float)
 parser.add_argument("--criterion", default="CrossEntropyLoss")
 parser.add_argument("--model", default="resnet50")
 parser.add_argument("--aug", default="basic")
+parser.add_argument("--valid_aug", default="basic")
 parser.add_argument("--num_classes", default=4, type=int)
 parser.add_argument("--device", default="cuda")
 parser.add_argument("--name", default="test")
@@ -79,6 +81,7 @@ CFG = {
     "device":args.device,
     "model":args.model,
     "aug":args.aug,
+    "valid_aug":args.valid_aug,
     "num_classes":args.num_classes,
     "wandb":args.wandb,
     "seed":args.seed
@@ -147,7 +150,7 @@ valid["image_path"] = image_folder + valid["image_path"]
 # dataset & dataloader
 dataset_module = getattr(import_module("dataset"), "ProductDataset")
 train_dataset = dataset_module(train["image_path"].tolist(), train["label"].tolist(), args, args.aug, True)
-valid_dataset = dataset_module(valid["image_path"].tolist(), valid["label"].tolist(), args, "basic", True) # metric을 얻기위해 train_mode = True
+valid_dataset = dataset_module(valid["image_path"].tolist(), valid["label"].tolist(), args, args.valid_aug, True) # metric을 얻기위해 train_mode = True
 
 train_loader = DataLoader(train_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)
 valid_loader = DataLoader(valid_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)

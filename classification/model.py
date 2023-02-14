@@ -26,7 +26,7 @@ class resnet50(nn.Module):
 
 class swinT(nn.Module):
     def __init__(self, num_classes):
-        super(swinB, self).__init__()
+        super(swinT, self).__init__()
         self.net = torchvision.models.swin_t(weights='DEFAULT')
         self.net.head = nn.Linear(in_features = 768, out_features=num_classes, bias=True)
 
@@ -36,7 +36,7 @@ class swinT(nn.Module):
 
 class swinS(nn.Module):
     def __init__(self, num_classes):
-        super(swinB, self).__init__()
+        super(swinS, self).__init__()
         self.net = torchvision.models.swin_s(weights='DEFAULT')
         self.net.head = nn.Linear(in_features = 768, out_features=num_classes, bias=True)
 

@@ -48,7 +48,7 @@ aug
 """
 parser.add_argument("--weight", default=600, type=int)
 parser.add_argument("--height", default=250, type=int)
-parser.add_argument("--epochs", default=20,type=int)
+parser.add_argument("--epochs", default=30,type=int)
 parser.add_argument("--batch_size", default=16,type=int)
 parser.add_argument("--lr", default=0.0001,type=float)
 parser.add_argument("--criterion", default="CrossEntropyLoss")

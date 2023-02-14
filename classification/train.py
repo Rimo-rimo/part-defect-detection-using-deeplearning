@@ -32,11 +32,12 @@ import metrics
 parser = argparse.ArgumentParser()
 
 """
-python train.py --model resnet50 --wandb True --name basic --aug basic ; 
-python train.py --model resnet50 --wandb True --name flip_aug --aug flip_aug ; 
-python train.py --model resnet50 --wandb True --name noise_aug --aug noise_aug ; 
-python train.py --model resnet50 --wandb True --name clahe_aug --aug clahe_aug ; 
-python train.py --model resnet50 --wandb True --name heavy_aug --aug heavy_aug ; 
+python train.py --model swinB --wandb True --name SwinB_basic --aug basic ; 
+python train.py --model swinB --wandb True --name SwinB_noise --aug noise_aug ; 
+python train.py --model swinS --wandb True --name SwinS_basic --aug basic ; 
+python train.py --model swinS --wandb True --name SwinS_noise --aug noise_aug ; 
+python train.py --model swinT --wandb True --name SwinT_basic --aug basic ; 
+python train.py --model swinT --wandb True --name SwinT_noise --aug noise_aug ; 
 
 aug
     basic
@@ -228,6 +229,6 @@ if __name__ == "__main__":
     set_model_folder(args)
     metrics = train(model, optimizer, train_loader,valid_loader, scheduler, args.device, args.name)
 
-    df = pd.DataFrame(metrics)
-    name = CFG["name"]
-    df.to_csv(f"./results/{name}.csv", index=False)
+    # df = pd.DataFrame(metrics)
+    # name = CFG["name"]
+    # df.to_csv(f"./results/{name}.csv", index=False)

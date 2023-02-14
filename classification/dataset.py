@@ -104,6 +104,7 @@ def heavy_aug(img, args):
 def noise_crop(img, args):
 
     transform = A.Compose([
+                    A.Resize(always_apply=False, p=1.0, height=args.height, width=args.weight, interpolation=0),
                     A.CenterCrop(always_apply=False, p=1.0, height=240, width=550),
                     A.OneOf([
                         A.Blur(always_apply=False, p=1.0, blur_limit=(1, 13)),
@@ -118,6 +119,7 @@ def noise_crop(img, args):
 def basic_crop(img, args):
 
     transform = A.Compose([
+                    A.Resize(always_apply=False, p=1.0, height=args.height, width=args.weight, interpolation=0),
                     A.CenterCrop(always_apply=False, p=1.0, height=240, width=550),
                     A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
                     ToTensorV2()

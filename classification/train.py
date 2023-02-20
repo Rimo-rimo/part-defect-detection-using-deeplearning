@@ -32,8 +32,9 @@ import metrics
 parser = argparse.ArgumentParser()
 
 """
-python train.py --model resnet50 --wandb True --name resnet50_crop_basic --aug basic_crop --epochs 20 --batch_size 16 --device cuda:1 --valid_aug basic_crop; 
-python train.py --model resnet50 --wandb True --name resnet50_crop_noise --aug noise_crop --epochs 20 --batch_size 16 --device cuda:1 --valid_aug basic_crop; 
+python train.py --model resnet18 --wandb True --name resnet18_basic_aub --aug noise_aug --epochs 20 --batch_size 16
+python train.py --model resnet18 --wandb True --name resnet18_flip_aug --aug flip_aug --epochs 20 --batch_size 16
+python train.py --model resnet18 --wandb True --name resnet18_heavy_aug --aug heaby_aug --epochs 20 --batch_size 16
 python train.py --model swinB --wandb True --name SwinB_noise --aug noise_aug ; 
 python train.py --model swinS --wandb True --name SwinS_basic --aug basic ; 
 python train.py --model swinS --wandb True --name SwinS_noise --aug noise_aug ; 

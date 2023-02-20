@@ -184,4 +184,3 @@ with col2:
     st.subheader("Camed Image")
     st.image(visualization)
     st.text(number_to_class[pred])
-

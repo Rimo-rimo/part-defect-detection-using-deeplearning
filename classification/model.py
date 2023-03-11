@@ -53,3 +53,13 @@ class swinB(nn.Module):
     def forward(self, x):
         x = self.net(x)
         return x
+    
+class mobilenet_v2(nn.Module):
+    def __init__(self, num_classes):
+        super(mobilenet_v2, self).__init__()
+        self.net = torch.hub.load('pytorch/vision:v0.10.0', 'mobilenet_v2', pretrained=True)
+        self.net.classifier[-1] = nn.Linear(in_features = 1280, out_features=num_classes, bias=True)
+    
+    def forward(self, x):
+        x = self.net(x)
+        return x

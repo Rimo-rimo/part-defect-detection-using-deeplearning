@@ -1,6 +1,6 @@
 import warnings
 warnings.filterwarnings(action='ignore')
-
+from importlib import import_module
 import pandas as pd
 import numpy as np
 import cv2
@@ -31,6 +31,7 @@ data_csv = "/Users/rimo/Documents/paper/data/test_for_cam-bbox.csv"
 json_path = "/Users/rimo/Documents/paper/data/data.json"
 device = torch.device("cpu")
 # ===========================set===========================
+
 model_types = [i for i in os.listdir(model_folder) if i[0]!="."]
 model_names = []
 for model_type in model_types:
@@ -98,59 +99,12 @@ def basic_crop(img):
     img = torch.unsqueeze(img,0)
     return img
 
-class resnet18(nn.Module):
-    def __init__(self, num_classes):
-        super(resnet18, self).__init__()
-        self.net = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=True)
-        self.net.fc = nn.Linear(in_features = 512, out_features=num_classes, bias=True)
 
-    def forward(self, x):
-        x = self.net(x)
-        return x
-
-class resnet50(nn.Module):
-    def __init__(self, num_classes):
-        super(resnet50, self).__init__()
-        self.net = torch.hub.load('pytorch/vision:v0.10.0', 'resnet50', pretrained=True)
-        self.net.fc = nn.Linear(in_features = 2048, out_features=num_classes, bias=True)
-    def forward(self, x):
-        x = self.net(x)
-        return x
-
-class swinT(nn.Module):
-    def __init__(self, num_classes):
-        super(swinT, self).__init__()
-        self.net = torchvision.models.swin_t(weights='DEFAULT')
-        self.net.head = nn.Linear(in_features = 768, out_features=num_classes, bias=True)
-
-    def forward(self, x):
-        x = self.net(x)
-        return x
-
-class swinS(nn.Module):
-    def __init__(self, num_classes):
-        super(swinS, self).__init__()
-        self.net = torchvision.models.swin_s(weights='DEFAULT')
-        self.net.head = nn.Linear(in_features = 768, out_features=num_classes, bias=True)
-
-    def forward(self, x):
-        x = self.net(x)
-        return x
-
-class swinB(nn.Module):
-    def __init__(self, num_classes):
-        super(swinB, self).__init__()
-        self.net = torchvision.models.swin_b(weights='DEFAULT')
-        self.net.head = nn.Linear(in_features = 1024, out_features=num_classes, bias=True)
-
-    def forward(self, x):
-        x = self.net(x)
-        return x
 
 
 # ST_사이드바 구축
 # st.title('[CAM Dashboard]')
-st.markdown("<h1 style='text-align: center; color : #6396D0;'>CAM Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color : #3182F6;'>CAM Dashboard</h1>", unsafe_allow_html=True)
 st.title(" ")
 with st.sidebar:
     model_name = st.selectbox(":blue[__MODEL NAME__]",model_names, index=0)
@@ -163,32 +117,28 @@ with st.sidebar:
 
 # ===========================back===========================
 model_path = model_folder + model_name + f"/{model_epoch * 5}.pth"
-model = globals()[model_name.split("/")[0]](4)
+model = getattr(import_module("model"), model_name.split("/")[0])
+model = model(4)
 model.load_state_dict(torch.load(model_path, map_location=device))
 model = model.eval()
 
 start = time.time()
+
 if transform in ["basic_crop", "noise_crop"]:
     w,h = 550, 240
 else:
     w,h = 600, 250
+
 if model_name.split("/")[0] == "resnet18":
     target_layers = [model.net.layer4[-1].conv2]
 elif model_name.split("/")[0] == "resnet50":
-    if model_layer == 1:
-        target_layers = [model.net.layer1[-1].conv3]
-    elif model_layer == 2:
-        target_layers = [model.net.layer2[-1].conv3]
-    elif model_layer == 3:
-        target_layers = [model.net.layer3[-1].conv3]
-    elif model_layer == 4:
-        target_layers = [model.net.layer4[-1].conv3]
+    target_layers = [model.net.layer4[-1].conv3]
 elif model_name.split("/")[0] == "swinT":
     target_layers = [model.net.features[-1][1].norm1]
 elif model_name.split("/")[0] == "swinS":
     target_layers = [model.net.features[-1][1].norm1]
 elif model_name.split("/")[0] == "swinB":
-    target_layers = [model.net.features[-1][-1].norm2]
+    target_layers = [model.net.features[-1][1].norm1]
 
 cam = GradCAM(model=model, target_layers=target_layers, use_cuda=False)
 
@@ -208,28 +158,7 @@ targets = [ClassifierOutputTarget(pred)] #
 grayscale_cam = cam(input_tensor=img, targets=targets)
 grayscale_cam = grayscale_cam[0,:]
 visualization = show_cam_on_image(image, grayscale_cam, use_rgb=True)
-
-# #========get bbox form cam========
-# visualization = grayscale_cam
-# ret, visualization = cv2.threshold(visualization, 0.7, 1.0, cv2.THRESH_BINARY)
-
 visualization = cv2.resize(visualization, dsize=(620,250))
-# x_, y_ =[],[]
-# for n_y, y in enumerate(visualization):
-#     is_y = False
-#     for n_x, x in enumerate(y):
-#         if x == 1.0:
-#             x_.append(n_x)
-#             is_y = True
-#     if is_y:
-#         y_.append(n_y)
-# x_min, x_max = min(x_), max(x_)
-# y_min, y_max = min(y_), max(y_)
-#========get bbox form cam========
-
-# visualization = cv2.rectangle(visualization,(x_min,y_min),(x_max,y_max), [1.0,0.0,0.0],3)
-# visualization = cv2.resize(visualization, dsize=(620,250))
-
 
 image = cv2.resize(image, dsize=(620,250))
 print("Pred : ",number_to_class[pred])
@@ -250,22 +179,20 @@ for i in anns:
 print(img.shape)
 img = img[ 700:1500 , 50 :2300]
 img = cv2.resize(img, dsize=(850,300))
-st.markdown("<h4 style='text-align:center; color:#808080'>[Origin]</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center; color:#3182F6'>[Origin]</h4>", unsafe_allow_html=True)
 st.image(img)
 
 col1, col2 = st.columns(2)
 with col1:
-    st.markdown("<h4 style='text-align: center; color:#808080'>[Knurling]</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color:#3182F6'>[Knurling]</h4>", unsafe_allow_html=True)
     # st.subheader("Origin Image")
     st.image(image)
     st.text(f"[GT] : {gt}")
     # st.markdown("<h10 style='text-align: center; color : #808080;'>[Origim Image]</h10>", unsafe_allow_html=True)
 
 with col2:
-    st.markdown("<h4 style='text-align: center; color:#808080'>[CAM]</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='text-align: center; color:#3182F6'>[CAM]</h4>", unsafe_allow_html=True)
     # st.subheader("Camed Image")
-    # visualization = cv2.rectangle(image,(x_max,y_max),(x_min,y_min), [1.0,0.0,0.0],10)
-    # visualization = cv2.resize(visualization, dsize=(620,250))
     st.image(visualization)
     st.text(f"[Pred] : {number_to_class[pred]}")
     # st.markdown("<h10 style='text-align: center; color : #808080;'>[Origim Image]</h10>", unsafe_allow_html=True)

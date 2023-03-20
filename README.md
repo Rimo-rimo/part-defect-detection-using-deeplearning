@@ -1,2 +1,2 @@
 # defective-product-detection
-https://fire-woodwind-3a8.notion.site/c0d79158e233407985f16ffae77dd271
+<img width="184" alt="image" src="https://user-images.githubusercontent.com/79796061/226329420-84b2b505-0aa1-47ad-b5a8-3ccd333759ff.png">

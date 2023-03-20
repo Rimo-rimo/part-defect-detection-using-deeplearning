@@ -57,9 +57,8 @@ Rod Assembly라 불리는 자동차 부품이 있습니다. 이러한 부품을 
 
 # Anomaly Detection
 
-<img width="700" alt="image" src="https://user-images.githubusercontent.com/79796061/226344376-7ccef030-bfe0-4637-9092-a6286fb0241f.png">
-
 위와 같이 미압입에 대한 불량 유형은 정상 데이터에 비해 무려 4배나 적은 데이터를 가지고 있었습니다. 제조 현장에서 흔히 발견할 수 있는 데이터 불균형 현상입니다. 이러한 문제를 해결하기 위해 정상 데이터만을 학습하는 비지도 학습방법론으로 이상치 탐지를 수행하였습니다.
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/79796061/226344376-7ccef030-bfe0-4637-9092-a6286fb0241f.png">
 <img width="738" alt="image" src="https://user-images.githubusercontent.com/79796061/226344409-2d423639-d089-4f78-9263-9f55c79073ff.png">
 
 

@@ -18,7 +18,6 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 import albumentations as A
 from albumentations import *
 from albumentations.pytorch import ToTensorV2
-
 from pycocotools.coco import COCO
 import json
 import time
@@ -30,6 +29,7 @@ bbox_image_foler = "/Users/rimo/Documents/paper/data/images/"
 data_csv = "/Users/rimo/Documents/paper/data/test_for_cam-bbox.csv"
 json_path = "/Users/rimo/Documents/paper/data/data.json"
 device = torch.device("cpu")
+
 # ===========================set===========================
 model_types = [i for i in os.listdir(model_folder) if i[0]!="."]
 model_names = []

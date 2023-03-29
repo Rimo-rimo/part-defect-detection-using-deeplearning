@@ -32,14 +32,8 @@ import metrics
 parser = argparse.ArgumentParser()
 
 """
-python train.py --model resnet18 --wandb True --name resnet18_basic_aub --aug noise_aug --epochs 20 --batch_size 16
-python train.py --model resnet18 --wandb True --name resnet18_flip_aug --aug flip_aug --epochs 20 --batch_size 16
-python train.py --model resnet18 --wandb True --name resnet18_heavy_aug --aug heaby_aug --epochs 20 --batch_size 16
-python train.py --model swinB --wandb True --name SwinB_noise --aug noise_aug ; 
-python train.py --model swinS --wandb True --name SwinS_basic --aug basic ; 
-python train.py --model swinS --wandb True --name SwinS_noise --aug noise_aug ; 
-python train.py --model swinT --wandb True --name SwinT_basic --aug basic ; 
-python train.py --model swinT --wandb True --name SwinT_noise --aug noise_aug ; 
+python train.py --model resnet50 --wandb False --name test_docker --aug noise_aug --device cpu --num_workers 1; 
+
 
 aug
     basic
@@ -62,6 +56,7 @@ parser.add_argument("--device", default="cuda")
 parser.add_argument("--name", default="test")
 parser.add_argument("--wandb", default="False")
 parser.add_argument("--seed", default=42, type=int)
+parser.add_argument("--num_workers", default=4, type=int)
 args = parser.parse_args()
 
 print("====="*5)
@@ -85,7 +80,8 @@ CFG = {
     "valid_aug":args.valid_aug,
     "num_classes":args.num_classes,
     "wandb":args.wandb,
-    "seed":args.seed
+    "seed":args.seed,
+    "num_workers":args.num_workers
     }
 
 
@@ -136,8 +132,8 @@ def set_model_folder(args):
         wandb.config.update(args)
 
 # Get Data
-data_folder = "/home/chicken/project/ABL/data/"
-image_folder = "/home/chicken/project/ABL/data/crop_images/"
+data_folder = "../../data/"
+image_folder = "../../data/crop_images/"
 
 train = pd.read_csv(os.path.join(data_folder, "train_csv_.csv"))
 valid = pd.read_csv(os.path.join(data_folder, "test_csv_.csv"))
@@ -153,8 +149,8 @@ dataset_module = getattr(import_module("dataset"), "ProductDataset")
 train_dataset = dataset_module(train["image_path"].tolist(), train["label"].tolist(), args, args.aug, True)
 valid_dataset = dataset_module(valid["image_path"].tolist(), valid["label"].tolist(), args, args.valid_aug, True) # metric을 얻기위해 train_mode = True
 
-train_loader = DataLoader(train_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)
-valid_loader = DataLoader(valid_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers=4)
+train_loader = DataLoader(train_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers = args.num_workers)
+valid_loader = DataLoader(valid_dataset, batch_size = CFG["batch_size"], shuffle=True, num_workers = args.num_workers)
 
 # modeling
 model_module = getattr(import_module("model"), CFG["model"])

@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader, Dataset
 import albumentations as A
 from albumentations import *
 from albumentations.pytorch import ToTensorV2
+from PIL import Image
 
 
 class ProductDataset(Dataset):
@@ -125,3 +126,56 @@ def basic_crop(img, args):
                     ToTensorV2()
                           ])
     return transform(image=img)["image"]
+
+
+#============== pre transform ==============
+def pre_transform_to_tensor(img_path):
+    img = cv2.imread(img_path)
+    img = Image.fromarray(img[:,:,:3])
+    img = torchvision.transforms.Resize((250,600))(img)
+    img = torchvision.transforms.ToTensor()(img)
+    img = torchvision.transforms.Normalize(mean=(0.485, 0.456, 0.406), std = (0.229, 0.224, 0.225))(img)
+    img = img.unsqueeze(0)
+    return img
+
+def pre_basic(img_path):
+    img = cv2.imread(img_path)
+    w,h = 600,250
+    test_transform = A.Compose([
+                            A.Resize(always_apply=False, p=1.0, height=h, width=w, interpolation=0),
+                            A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                            ToTensorV2()
+                                ])
+
+    img = test_transform(image=img)["image"]
+    img = torch.unsqueeze(img,0)
+    return img
+
+def pre_noise_crop(img):
+    img = cv2.imread(img)
+    transform = A.Compose([
+                    A.Resize(always_apply=False, p=1.0, height=250, width=600, interpolation=0),
+                    A.CenterCrop(always_apply=False, p=1.0, height=240, width=550),
+                    A.OneOf([
+                        A.Blur(always_apply=False, p=1.0, blur_limit=(1, 13)),
+                        A.AdvancedBlur(always_apply=False, p=1.0, blur_limit=(3, 7), sigmaX_limit=(0.2, 1.0), sigmaY_limit=(0.2, 1.0), rotate_limit=(-90, 90), beta_limit=(0.5, 8.0), noise_limit=(0.9, 1.1)),
+                        A.ISONoise(always_apply=False, p=1.0, intensity=(0.1, 0.5), color_shift=(0.01, 0.05)),         
+                             ], p=0.3),
+                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                    ToTensorV2()
+                          ])
+    img = transform(image=img)["image"]
+    img = torch.unsqueeze(img,0)
+    return img
+
+def pre_basic_crop(img):
+    img = cv2.imread(img)
+    transform = A.Compose([
+                    A.Resize(always_apply=False, p=1.0, height=250, width=600, interpolation=0),
+                    A.CenterCrop(always_apply=False, p=1.0, height=240, width=550),
+                    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+                    ToTensorV2()
+                          ])
+    img = transform(image=img)["image"]
+    img = torch.unsqueeze(img,0)
+    return img
